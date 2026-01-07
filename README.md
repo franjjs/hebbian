@@ -2,7 +2,9 @@
 
 **Hebbian** is an associative memory tool for your clipboard. Unlike conventional managers that use a simple FIFO queue, Hebbian treats data as nodes in a **Graph Database (KùzuDB)**.
 
-It implements a digital version of **Hebb's Rule**: *"Nodes that fire together, wire together."* The more you use information within a specific context (IDE, Terminal, Browser), the stronger its "synaptic weight" becomes.
+It implements a digital version of **Hebb's Rule**: *"Nodes that fire together, wire together."* 
+
+The more you use information within a specific context (IDE, Terminal, Browser), the stronger its "synaptic weight" becomes.
 
 ## 🚀 Prerequisites (Linux/Ubuntu)
 
