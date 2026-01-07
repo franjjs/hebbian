@@ -1,8 +1,11 @@
+from sentence_transformers import SentenceTransformer
+import numpy as np
 import kuzu
 from pathlib import Path
 
 class HebbianBrain:
     def __init__(self, db_path="./data/hebb_db", read_only=False):
+        self.model = SentenceTransformer('all-MiniLM-L6-v2')
         Path(db_path).parent.mkdir(parents=True, exist_ok=True)
         
         # Kuzu 0.7.1 single-file mode
@@ -17,19 +20,22 @@ class HebbianBrain:
 
     def _init_schema(self):
         try:
-            self.conn.execute("CREATE NODE TABLE Memory(content STRING, weight INT64, last_seen TIMESTAMP, PRIMARY KEY (content))")
+            self.conn.execute("CREATE NODE TABLE Memory(content STRING, weight INT64, last_seen TIMESTAMP, embedding STRING, PRIMARY KEY (content))")
             self.conn.execute("CREATE NODE TABLE Context(name STRING, PRIMARY KEY (name))")
             self.conn.execute("CREATE REL TABLE ASSOCIATED_WITH(FROM Memory TO Context)")
         except:
-            pass 
+            pass
 
     def strengthen(self, content, context_name):
+        # Compute embedding for the content
+        embedding = self.model.encode(content)
+        embedding_str = ','.join(map(lambda x: f"{x:.4f}", embedding.tolist()))
         # Only create or update last_seen, do NOT increment weight
         self.conn.execute("""
             MERGE (m:Memory {content: $content})
             ON MATCH SET m.last_seen = current_timestamp()
-            ON CREATE SET m.weight = 1, m.last_seen = current_timestamp()
-        """, {"content": content})
+            ON CREATE SET m.weight = 1, m.last_seen = current_timestamp(), m.embedding = $embedding
+        """, {"content": content, "embedding": embedding_str})
         self.conn.execute("MERGE (c:Context {name: $name})", {"name": context_name})
         self.conn.execute("""
             MATCH (m:Memory), (c:Context) WHERE m.content = $content AND c.name = $name
@@ -48,7 +54,7 @@ class HebbianBrain:
         query = """
         MATCH (m:Memory)-[:ASSOCIATED_WITH]->(c:Context)
         WITH m, c, (c.name = $ctx) as is_context
-        RETURN m.content, m.weight, is_context
+        RETURN m.content, m.weight, is_context, m.embedding
         ORDER BY is_context DESC, m.weight DESC, m.last_seen DESC
         LIMIT $limit
         """
@@ -56,7 +62,7 @@ class HebbianBrain:
         memories = []
         while res.has_next():
             row = res.get_next()
-            memories.append({"content": row[0], "weight": row[1], "is_context": row[2]})
+            memories.append({"content": row[0], "weight": row[1], "is_context": row[2], "embedding": row[3]})
         return memories
 
     def get_full_graph_summary(self):
