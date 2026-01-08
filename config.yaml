@@ -1,0 +1,14 @@
+# Hebbian Configuration
+
+database:
+  path: "./data/hebb_db"
+
+hotkeys:
+  copy: "<ctrl>+<cmd>+c"
+  paste: "<ctrl>+<cmd>+v"
+  delete: "<cmd>+<alt>+d"
+
+settings:
+  decay_on_startup: true
+  paste_delay: 0.1
+  ttl: 5000  # Time-to-live for memories in seconds

@@ -4,9 +4,9 @@ from pathlib import Path
 DEFAULT_CONFIG = {
     "database": {"path": "./data/hebb_db"},
     "hotkeys": {
-        "copy": "<cmd>+<alt>+c",
-        "paste": "<cmd>+<alt>+v",
-        "delete": "<cmd>+<alt>+d"
+        "copy": "<ctrl>+<cmd>+c",
+        "paste": "<ctrl>+<cmd>+v",
+        "delete": "<ctrl>+<cmd>+d"
     },
     "settings": {"decay_on_startup": True, "paste_delay": 0.1}
 }
