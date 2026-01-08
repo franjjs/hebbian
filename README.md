@@ -52,6 +52,36 @@ settings:
 - Start the daemon: `uv run hebb` or `python -m hebbian.main`
 - Copy with hotkey, paste with semantic recall, delete all memories with the delete hotkey.
 
+## Explorer Utility
+
+Hebbian includes a database explorer utility to query and visualize stored memories:
+
+### Command Line Usage
+
+If you install the package with `uv pip install -e .` or have it in your environment, you can run:
+
+```bash
+uv run explorer [--full] [search_term]
+```
+
+Or, if the script is installed as a global command:
+
+```bash
+explorer [--full] [search_term]
+```
+
+- `--full`: Shows the full content of each memory.
+- `search_term`: Filters memories by the given search term in their content.
+
+### Example
+
+```bash
+explorer --full
+explorer permission
+```
+
+This will display all stored memories grouped by context, or only those matching the search term.
+
 ---
 For more details, see the source files in `src/hebbian/`.
 
